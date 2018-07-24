@@ -84,11 +84,11 @@ STATIC mp_obj_t bluetooth_advertise(size_t n_args, const mp_obj_t *pos_args, mp_
     mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
     mp_int_t interval = args[ARG_interval].u_int;
-    interval = interval * 8 / 5; // convert from 1ms to 0.625ms units
     if (interval == 0) {
         mp_bt_advertise_stop();
         return mp_const_none;
     }
+    interval = interval * 8 / 5; // convert from 1ms to 0.625ms units
     if (interval < 0x20 || interval > 0x4000) {
         mp_raise_ValueError("interval out of range");
     }

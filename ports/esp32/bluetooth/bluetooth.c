@@ -165,7 +165,6 @@ STATIC void mp_bt_gap_callback(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_para
             xSemaphoreGive(mp_bt_call_complete);
             break;
         case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
-            mp_bt_call_status = param->adv_stop_cmpl.status;
             xSemaphoreGive(mp_bt_call_complete);
             break;
         default:
