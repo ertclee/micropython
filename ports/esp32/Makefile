@@ -103,6 +103,7 @@ INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/bta/gatt/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/bta/sys/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/btc/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/btc/profile/esp/include
+INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/btc/profile/esp/blufi/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/btc/profile/std/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/common/include
 INC_ESPCOMP += -I$(ESPCOMP)/bt/bluedroid/device/include
@@ -654,6 +655,19 @@ ESPIDF_BT_O = $(addprefix $(ESPCOMP)/bt/,\
 	bluedroid/bta/dm/bta_dm_main.o \
 	bluedroid/bta/dm/bta_dm_pm.o \
 	bluedroid/bta/dm/bta_dm_sco.o \
+	bluedroid/bta/gatt/bta_gattc_act.o \
+	bluedroid/bta/gatt/bta_gattc_api.o \
+	bluedroid/bta/gatt/bta_gattc_cache.o \
+	bluedroid/bta/gatt/bta_gattc_ci.o \
+	bluedroid/bta/gatt/bta_gattc_co.o \
+	bluedroid/bta/gatt/bta_gattc_main.o \
+	bluedroid/bta/gatt/bta_gatt_common.o \
+	bluedroid/bta/gatt/bta_gattc_utils.o \
+	bluedroid/bta/gatt/bta_gatts_act.o \
+	bluedroid/bta/gatt/bta_gatts_api.o \
+	bluedroid/bta/gatt/bta_gatts_co.o \
+	bluedroid/bta/gatt/bta_gatts_main.o \
+	bluedroid/bta/gatt/bta_gatts_utils.o \
 	bluedroid/bta/sys/bta_sys_conn.o \
 	bluedroid/bta/sys/bta_sys_main.o \
 	bluedroid/bta/sys/utl.o \
@@ -670,6 +684,8 @@ ESPIDF_BT_O = $(addprefix $(ESPCOMP)/bt/,\
 	bluedroid/btc/core/btc_storage.o \
 	bluedroid/btc/core/btc_task.o \
 	bluedroid/btc/core/btc_util.o \
+	bluedroid/btc/profile/esp/blufi/blufi_prf.o \
+	bluedroid/btc/profile/esp/blufi/blufi_protocol.o \
 	bluedroid/btc/profile/std/gap/btc_gap_ble.o \
 	bluedroid/btc/profile/std/gap/btc_gap_bt.o \
 	bluedroid/btc/profile/std/gatt/btc_gattc.o \

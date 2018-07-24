@@ -28,6 +28,7 @@
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
+#include "esp_gatts_api.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -38,9 +39,14 @@
 
 // Semaphore to serialze asynchronous calls.
 STATIC SemaphoreHandle_t mp_bt_call_complete;
-esp_bt_status_t mp_bt_call_status;
+STATIC esp_bt_status_t mp_bt_call_status;
+
+STATIC mp_bt_adv_type_t bluetooth_adv_type;
+STATIC uint16_t bluetooth_adv_interval;
+
 
 STATIC void mp_bt_gap_callback(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
+STATIC void mp_bt_gatts_callback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 
 
 // Convert an esp_err_t into an errno number.
@@ -90,6 +96,14 @@ int mp_bt_enable(void) {
     if (err != 0) {
         return mp_bt_esp_errno(err);
     }
+    err = esp_ble_gatts_register_callback(mp_bt_gatts_callback);
+    if (err != 0) {
+        return mp_bt_esp_errno(err);
+    }
+    err = esp_ble_gatts_app_register(0);
+    if (err != 0) {
+        return mp_bt_esp_errno(err);
+    }
     return 0;
 }
 
@@ -104,6 +118,19 @@ void mp_bt_disable(void) {
 
 bool mp_bt_is_enabled(void) {
     return esp_bluedroid_get_status() == ESP_BLUEDROID_STATUS_ENABLED;
+}
+
+
+STATIC esp_err_t mp_bt_advertise_start_internal(void) {
+    esp_ble_adv_params_t ble_adv_params = {0,
+        .adv_int_min       = bluetooth_adv_interval,
+        .adv_int_max       = bluetooth_adv_interval,
+        .adv_type          = bluetooth_adv_type,
+        .own_addr_type     = BLE_ADDR_TYPE_PUBLIC,
+        .channel_map       = ADV_CHNL_ALL,
+        .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
+    };
+    return esp_ble_gap_start_advertising(&ble_adv_params);
 }
 
 
@@ -124,15 +151,9 @@ int mp_bt_advertise_start(mp_bt_adv_type_t type, uint16_t interval, uint8_t *adv
         xSemaphoreTake(mp_bt_call_complete, portMAX_DELAY);
     }
 
-    esp_ble_adv_params_t ble_adv_params = {0,
-        .adv_int_min       = interval,
-        .adv_int_max       = interval,
-        .adv_type          = type,
-        .own_addr_type     = BLE_ADDR_TYPE_PUBLIC,
-        .channel_map       = ADV_CHNL_ALL,
-        .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
-    };
-    esp_err_t err = esp_ble_gap_start_advertising(&ble_adv_params);
+    bluetooth_adv_type = type;
+    bluetooth_adv_interval = interval;
+    esp_err_t err = mp_bt_advertise_start_internal();
     if (err != 0) {
         return mp_bt_esp_errno(err);
     }
@@ -162,13 +183,33 @@ STATIC void mp_bt_gap_callback(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_para
             break;
         case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
             mp_bt_call_status = param->adv_start_cmpl.status;
+            // May return an error (queue full) when called from
+            // mp_bt_gatts_callback, but that's OK.
             xSemaphoreGive(mp_bt_call_complete);
             break;
         case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
             xSemaphoreGive(mp_bt_call_complete);
             break;
+        case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
+            break;
         default:
-            ESP_LOGI("bluetooth", "unknown GAP event: %d", event);
+            ESP_LOGI("bluetooth", "GAP: unknown event: %d", event);
+            break;
+    }
+}
+
+STATIC void mp_bt_gatts_callback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
+    switch (event) {
+        case ESP_GATTS_REG_EVT:
+            break;
+        case ESP_GATTS_CONNECT_EVT:
+            break;
+        case ESP_GATTS_DISCONNECT_EVT:
+            // restart advertisement
+            mp_bt_advertise_start_internal();
+            break;
+        default:
+            ESP_LOGI("bluetooth", "GATTS: unknown event: %d", event);
             break;
     }
 }
