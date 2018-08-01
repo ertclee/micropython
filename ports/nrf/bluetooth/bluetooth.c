@@ -66,6 +66,8 @@ STATIC uint16_t bluetooth_adv_interval;
 #include "nrf_nvic.h"
 nrf_nvic_state_t nrf_nvic_state = {0};
 static uint8_t bluetooth_adv_handle;
+static uint8_t bluetooth_adv_data[31];
+static uint8_t bluetooth_sr_data[31];
 #endif
 
 #if NRF51
@@ -207,10 +209,17 @@ int mp_bt_advertise_start(mp_bt_adv_type_t type, uint16_t interval, uint8_t *adv
     return mp_bt_errno(err_code);
 
 #elif NRF52
+    if (adv_data_len) {
+        memcpy(bluetooth_adv_data, adv_data, adv_data_len);
+    }
+    if (sr_data_len) {
+        memcpy(bluetooth_sr_data, sr_data, sr_data_len);
+    }
+
     ble_gap_adv_data_t ble_adv_data = {0};
-    ble_adv_data.adv_data.p_data = adv_data;
+    ble_adv_data.adv_data.p_data = bluetooth_adv_data;
     ble_adv_data.adv_data.len = adv_data_len;
-    ble_adv_data.scan_rsp_data.p_data = sr_data;
+    ble_adv_data.scan_rsp_data.p_data = bluetooth_sr_data;
     ble_adv_data.scan_rsp_data.len = sr_data_len;
 
     ble_gap_adv_params_t adv_params = {0};
