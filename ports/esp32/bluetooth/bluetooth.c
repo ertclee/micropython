@@ -36,7 +36,6 @@
 #include "py/mperrno.h"
 #include "extmod/modbluetooth.h"
 
-
 // Semaphore to serialze asynchronous calls.
 STATIC SemaphoreHandle_t mp_bt_call_complete;
 STATIC esp_bt_status_t mp_bt_call_status;
@@ -44,10 +43,8 @@ STATIC esp_bt_status_t mp_bt_call_status;
 STATIC mp_bt_adv_type_t bluetooth_adv_type;
 STATIC uint16_t bluetooth_adv_interval;
 
-
 STATIC void mp_bt_gap_callback(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
 STATIC void mp_bt_gatts_callback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
-
 
 // Convert an esp_err_t into an errno number.
 STATIC int mp_bt_esp_errno(esp_err_t err) {
@@ -57,7 +54,6 @@ STATIC int mp_bt_esp_errno(esp_err_t err) {
     return 0;
 }
 
-
 // Convert the result of an asynchronous call to an errno value.
 STATIC int mp_bt_status_errno() {
     if (mp_bt_call_status != ESP_BT_STATUS_SUCCESS) {
@@ -66,13 +62,11 @@ STATIC int mp_bt_status_errno() {
     return 0;
 }
 
-
 // Initialize at early boot.
 void mp_bt_init(void) {
     esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT);
     mp_bt_call_complete = xSemaphoreCreateBinary();
 }
-
 
 int mp_bt_enable(void) {
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
@@ -107,7 +101,6 @@ int mp_bt_enable(void) {
     return 0;
 }
 
-
 void mp_bt_disable(void) {
     esp_bluedroid_disable();
     esp_bluedroid_deinit();
@@ -115,11 +108,9 @@ void mp_bt_disable(void) {
     esp_bt_controller_deinit();
 }
 
-
 bool mp_bt_is_enabled(void) {
     return esp_bluedroid_get_status() == ESP_BLUEDROID_STATUS_ENABLED;
 }
-
 
 STATIC esp_err_t mp_bt_advertise_start_internal(void) {
     esp_ble_adv_params_t ble_adv_params = {0,
@@ -132,7 +123,6 @@ STATIC esp_err_t mp_bt_advertise_start_internal(void) {
     };
     return esp_ble_gap_start_advertising(&ble_adv_params);
 }
-
 
 int mp_bt_advertise_start(mp_bt_adv_type_t type, uint16_t interval, uint8_t *adv_data, size_t adv_data_len, uint8_t *sr_data, size_t sr_data_len) {
     if (adv_data != NULL) {
@@ -161,7 +151,6 @@ int mp_bt_advertise_start(mp_bt_adv_type_t type, uint16_t interval, uint8_t *adv
     return mp_bt_status_errno();
 }
 
-
 void mp_bt_advertise_stop(void) {
     esp_err_t err = esp_ble_gap_stop_advertising();
     if (err != 0) {
@@ -169,7 +158,6 @@ void mp_bt_advertise_stop(void) {
     }
     xSemaphoreTake(mp_bt_call_complete, portMAX_DELAY);
 }
-
 
 // Event callbacks. Most API calls generate an event here to report the
 // result.

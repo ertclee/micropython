@@ -96,7 +96,6 @@ STATIC const nrf_clock_lf_cfg_t clock_config = {
 #endif // BLUETOOTH_LFCLK_RC
 #endif // !NRF51
 
-
 STATIC const uint8_t ble_default_device_name[] = "MPY";
 
 // Connection params for sd_ble_gap_ppcp_set.
@@ -241,7 +240,6 @@ void mp_bt_advertise_stop(void) {
 #endif
 }
 
-
 static void ble_evt_handler(ble_evt_t * p_ble_evt) {
     switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_DISCONNECTED:
@@ -260,7 +258,6 @@ static void ble_evt_handler(ble_evt_t * p_ble_evt) {
     }
 }
 
-
 static void sd_evt_handler(uint32_t evt_id) {
     switch (evt_id) {
 #if MICROPY_MBFS
@@ -276,7 +273,6 @@ static void sd_evt_handler(uint32_t evt_id) {
             break;
     }
 }
-
 
 static uint8_t m_ble_evt_buf[sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT)] __attribute__ ((aligned (4)));
 

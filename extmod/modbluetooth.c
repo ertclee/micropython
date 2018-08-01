@@ -42,7 +42,6 @@ STATIC const mp_obj_bluetooth_t bluetooth_obj = {
     { &bluetooth_type },
 };
 
-
 // Easier (hopefully tail-called) error handling.
 STATIC mp_obj_t bluetooth_handle_errno(int errno_) {
     if (errno_ != 0) {
@@ -51,11 +50,9 @@ STATIC mp_obj_t bluetooth_handle_errno(int errno_) {
     return mp_const_none;
 }
 
-
 STATIC mp_obj_t bluetooth_make_new() {
     return MP_OBJ_FROM_PTR(&bluetooth_obj);
 }
-
 
 STATIC mp_obj_t bluetooth_active(size_t n_args, const mp_obj_t *args) {
     if (n_args == 2) { // boolean enable/disable argument supplied
@@ -71,7 +68,6 @@ STATIC mp_obj_t bluetooth_active(size_t n_args, const mp_obj_t *args) {
     return mp_obj_new_bool(mp_bt_is_enabled());
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(bluetooth_active_obj, 1, 2, bluetooth_active);
-
 
 STATIC mp_obj_t bluetooth_advertise(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
     enum { ARG_interval, ARG_name, ARG_connectable };
@@ -127,13 +123,11 @@ STATIC mp_obj_t bluetooth_advertise(size_t n_args, const mp_obj_t *pos_args, mp_
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_KW(bluetooth_advertise_obj, 1, bluetooth_advertise);
 
-
 STATIC const mp_rom_map_elem_t bluetooth_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_active), MP_ROM_PTR(&bluetooth_active_obj) },
     { MP_ROM_QSTR(MP_QSTR_advertise), MP_ROM_PTR(&bluetooth_advertise_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(bluetooth_locals_dict, bluetooth_locals_dict_table);
-
 
 STATIC const mp_obj_type_t bluetooth_type = {
     { &mp_type_type },
@@ -142,13 +136,11 @@ STATIC const mp_obj_type_t bluetooth_type = {
     .locals_dict = (void*)&bluetooth_locals_dict,
 };
 
-
 STATIC const mp_rom_map_elem_t mp_module_bluetooth_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_bluetooth) },
     { MP_ROM_QSTR(MP_QSTR_Bluetooth), MP_ROM_PTR(&bluetooth_type) },
 };
 STATIC MP_DEFINE_CONST_DICT(mp_module_bluetooth_globals, mp_module_bluetooth_globals_table);
-
 
 const mp_obj_module_t mp_module_bluetooth = {
     .base = { &mp_type_module },
